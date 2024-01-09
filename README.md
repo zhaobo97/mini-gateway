@@ -1,4 +1,4 @@
-基于Netty实现，使用Nacos作为注册与配置中心的api网关。通过SPI机制加载插件实现可插拔式过滤链，
+Api-gatway：原生Java实现，使用Netty作为通信框架，Nacos作为注册与配置中心的api网关。
 
 网关功能点包括：
 1. 路由转发
