@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+autoconfigure.core.client.org.zhaobo.ping.ApiClientAutoConfiguration
