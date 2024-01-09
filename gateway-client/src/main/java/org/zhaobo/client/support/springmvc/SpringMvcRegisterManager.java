@@ -15,12 +15,12 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 import org.zhaobo.client.core.ApiAnnotationScanner;
 import org.zhaobo.client.core.ApiProperties;
 import org.zhaobo.client.support.AbstractClientRegisterManager;
-import org.zhaobo.ping.common.config.ServiceDefinition;
-import org.zhaobo.ping.common.config.ServiceInstance;
-import org.zhaobo.ping.common.constants.BasicConst;
-import org.zhaobo.ping.common.constants.GatewayConst;
-import org.zhaobo.ping.common.utils.NetUtils;
-import org.zhaobo.ping.common.utils.TimeUtil;
+import org.zhaobo.common.config.ServiceDefinition;
+import org.zhaobo.common.config.ServiceInstance;
+import org.zhaobo.common.constants.BasicConst;
+import org.zhaobo.common.constants.GatewayConst;
+import org.zhaobo.common.utils.NetUtils;
+import org.zhaobo.common.utils.TimeUtil;
 
 import javax.annotation.Resource;
 import java.util.HashSet;

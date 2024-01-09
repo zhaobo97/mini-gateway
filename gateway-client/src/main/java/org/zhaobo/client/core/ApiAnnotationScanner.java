@@ -4,11 +4,11 @@ import com.alibaba.nacos.common.utils.StringUtils;
 import org.zhaobo.client.support.dubbo.DubboConstants;
 import org.apache.dubbo.config.ProviderConfig;
 import org.apache.dubbo.config.spring.ServiceBean;
-import org.zhaobo.ping.common.config.DubboServiceInvoker;
-import org.zhaobo.ping.common.config.HttpServiceInvoker;
-import org.zhaobo.ping.common.config.ServiceDefinition;
-import org.zhaobo.ping.common.config.ServiceInvoker;
-import org.zhaobo.ping.common.constants.BasicConst;
+import org.zhaobo.common.config.DubboServiceInvoker;
+import org.zhaobo.common.config.HttpServiceInvoker;
+import org.zhaobo.common.config.ServiceDefinition;
+import org.zhaobo.common.config.ServiceInvoker;
+import org.zhaobo.common.constants.BasicConst;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;

@@ -3,9 +3,9 @@ package org.zhaobo.client.support;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.zhaobo.client.core.ApiProperties;
-import org.zhaobo.ping.common.config.ServiceDefinition;
-import org.zhaobo.ping.common.config.ServiceInstance;
-import org.zhaobo.ping.registry.center.api.RegisterCenter;
+import org.zhaobo.common.config.ServiceDefinition;
+import org.zhaobo.common.config.ServiceInstance;
+import org.zhaobo.registry.center.api.RegisterCenter;
 
 import java.util.ServiceLoader;
 
