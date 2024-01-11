@@ -17,7 +17,7 @@ public class Config {
     // 启动端口
     private int port = 8888;
     // 普罗米修斯数据采集端口
-    private int prometheusPort = 18000;
+    private int prometheusPort = 19000;
     // 应用名称
     private String applicationName = "api-gateway";
     // 注册中心

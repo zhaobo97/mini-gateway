@@ -28,7 +28,7 @@
     <lombok.version>1.18.24</lombok.version>
     <fastjson.verson>1.2.83</fastjson.verson>
     <jackson.version>2.12.3</jackson.version>
-
+    <log4j2.version>2.11.1</log4j2.version>
   </properties>
 
   <dependencies>
@@ -59,10 +59,25 @@
       <artifactId>slf4j-api</artifactId>
       <version>1.7.32</version>
     </dependency>
+<!--    <dependency>-->
+<!--      <groupId>ch.qos.logback</groupId>-->
+<!--      <artifactId>logback-classic</artifactId>-->
+<!--      <version>1.2.3</version> &lt;!&ndash; 使用最新的版本 &ndash;&gt;-->
+<!--    </dependency>-->
     <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-      <version>1.2.3</version> <!-- 使用最新的版本 -->
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-core</artifactId>
+      <version>${log4j2.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-slf4j-impl</artifactId>
+      <version>${log4j2.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-slf4j-impl</artifactId>
+      <version>${log4j2.version}</version>
     </dependency>
 
     <!--将Java对象转换为Json字符串，以及Json字符串转换为Java对象-->
