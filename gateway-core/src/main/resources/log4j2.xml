@@ -71,7 +71,6 @@
         <!--如果一个 Logger 没有显式的被配置，则会使用 Root Logger 的配置，将日志输出到 CONSOLE、accessLog和 RandomAccessFile。-->
         <Root level="info">
             <Appender-Ref ref="CONSOLE"/>
-            <Appender-Ref ref="AccessLogFile"/>
             <Appender-Ref ref="RandomAccessFile"/>
         </Root>
     </Loggers>
