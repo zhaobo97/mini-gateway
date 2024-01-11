@@ -41,7 +41,7 @@ public class Config {
     private int maxContentLength = 64 * 1024 *1024;
 
     // 单双异步，默认单异步
-    private boolean whenComplete = false;
+    private boolean whenComplete = true;
 
 
     //	Http Async 参数选项：

@@ -8,6 +8,7 @@ import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.util.CharsetUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.skywalking.apm.toolkit.trace.TraceCrossThread;
 import org.asynchttpclient.Request;
 import org.asynchttpclient.Response;
 import org.slf4j.Logger;
@@ -31,6 +32,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeoutException;
+import java.util.function.BiConsumer;
 
 /**
  * @Auther: bo
@@ -56,6 +58,16 @@ public class RouterFilter implements Filter {
         }
     }
 
+    /**
+     * 1. 当一个服务调用被包装在HystrixCommand中时，Hystrix首先检查熔断器的状态。如果熔断器打开，则直接执行回退逻辑，不再执行实际的服务调用。
+     * 2. 如果熔断器是关闭的，Hystrix执行服务调用。如果调用成功，Hystrix返回结果；如果调用失败或超时，Hystrix根据配置的降级逻辑执行回退操作。
+     * 3. 在执行命令时，Hystrix还会监视命令的性能指标，如响应时间、错误率等。如果这些性能指标超过了预定的阈值，熔断器可以打开以防止继续请求失败。
+     * 具体的，在滑动窗口范围内，请求次数超过设置的阈值、或者失败率达到设置的阈值、或者请求超时，就会打开熔断器一段时间。
+     * 4. 如果熔断器在一段时间内保持打开状态，那么在一段时间后会尝试半开状态，允许一些请求通过以测试服务是否恢复正常。
+     *
+     * @param ctx
+     * @param hystrixConfig
+     */
     private void routeWhithHystrix(GatewayContext ctx, Rule.HystrixConfig hystrixConfig) {
         HystrixCommand.Setter setter = HystrixCommand.Setter
                 .withGroupKey(HystrixCommandGroupKey.Factory
@@ -86,7 +98,7 @@ public class RouterFilter implements Filter {
 
             @Override
             protected Object getFallback() {
-                flag = true;
+//                flag = true;
                 ctx.setWritten();
                 ctx.releaseRequest();
                 String fallbackMessage = hystrixConfig.getFallbackMessage();
@@ -110,30 +122,64 @@ public class RouterFilter implements Filter {
     }
 
     /**
-     * 路由到单异步处理或双异步处理
+     * whenComplete是一个非异步的完成方法。
+     * 当CompletableFuture的执行完成或者发生异常时，它提供了一个回调。
+     * 这个回调将在CompletableFuture执行的相同线程中执行。这意味着，如果CompletableFuture的操作是阻塞的，那么回调也会在同一个阻塞的线程中执行。
+     * 在这段代码中，如果whenComplete为true，则在future完成时使用whenComplete方法。这意味着complete方法将在future所在的线程中被调用。
+     * <p>
+     * whenCompleteAsync是异步的完成方法。
+     * 它也提供了一个在CompletableFuture执行完成或者发生异常时执行的回调。
+     * 与whenComplete不同，这个回调将在不同的线程中异步执行。通常情况下，它将在默认的ForkJoinPool中的某个线程上执行，除非提供了自定义的Executor。
+     * 在代码中，如果whenComplete为false，则使用whenCompleteAsync。这意味着complete方法将在不同的线程中异步执行。
      *
      * @param gatewayContext
      */
     private void route(GatewayContext gatewayContext, Rule.HystrixConfig config) {
+        log.info("route");
         try {
             Request request = gatewayContext.getRequest().build();
             // 执行请求
             CompletableFuture<Response> future = AsyncHttpHelper.getInstance().executeRequest(request);
-            // 单异步
             boolean whenComplete = ConfigLoader.getInstance().getConfig().isWhenComplete();
             if (whenComplete) {
-                future.whenComplete((futureResponse, throwable) -> {
-                    complete(request, futureResponse, gatewayContext, throwable, config);
-                });
+                future.whenComplete(new TraceBiConsumer(request, gatewayContext, config));
             } else {
-                future.whenCompleteAsync((futureResponse, throwable) -> {
-                    complete(request, futureResponse, gatewayContext, throwable, config);
-                });
+                future.whenCompleteAsync(new TraceBiConsumer(request, gatewayContext, config));
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
+
+    @TraceCrossThread
+    public class TraceBiConsumer implements BiConsumer<Response, Throwable> {
+        private final Request request;
+        private final GatewayContext gatewayContext;
+        private final Rule.HystrixConfig config;
+        private Response response;
+        private Throwable throwable;
+
+        public TraceBiConsumer(Request request, GatewayContext gatewayContext, Rule.HystrixConfig config) {
+            this.request = request;
+            this.gatewayContext = gatewayContext;
+            this.config = config;
+        }
+
+        @Override
+        public void accept(Response response, Throwable throwable) {
+            this.response = response;
+            this.throwable = throwable;
+            run();
+        }
+
+        /**
+         * skywalking会通过 @TraceCrossThread 注解增强run方法
+         */
+        private void run() {
+            complete(request, response, gatewayContext, throwable, config);
+        }
+    }
+
 
     /**
      * 1.释放资源
@@ -146,15 +192,17 @@ public class RouterFilter implements Filter {
      * @param throwable
      */
     private void complete(Request request,
-                          Response futureResponse,
-                          GatewayContext gatewayContext,
-                          Throwable throwable,
-                          Rule.HystrixConfig config) {
-        //如果已经触发了getFallback了，就不再执行这段逻辑了，避免出现问题
-        if (flag){
-            flag = false;
-            return;
-        }
+                                 Response futureResponse,
+                                 GatewayContext gatewayContext,
+                                 Throwable throwable,
+                                 Rule.HystrixConfig config) {
+//        //如果已经触发了getFallback了，就不再执行这段逻辑了，避免出现问题
+//        if (flag){
+//            flag = false;
+//            return;
+//        }
+
+        log.info("complete");
 
         // 失败重试
         //获取已重试的次数
@@ -221,7 +269,7 @@ public class RouterFilter implements Filter {
      * @param currentTimes
      */
     private void doRetry(GatewayContext gatewayContext, int currentTimes) {
-        log.info("=============== 第{}次重试===============", currentTimes+1);
+        log.info("=============== 第{}次重试===============", currentTimes + 1);
         gatewayContext.setCurrentRetryTimes(currentTimes + 1);
         doFilter(gatewayContext);
     }

@@ -1,0 +1,60 @@
+{
+  "rules": [
+    {
+      "id": "1",
+      "name": "rule-1",
+      "protocol": "http",
+      "serviceId": "backend-http-server",
+      "prefix": "/http-server",
+      "paths": [
+        "/http-server/ping"
+      ],
+      "filterConfigs":[
+        {
+          "id": "load_balance_filter",
+          "config": {"load_balance": "round_robin"}
+        },
+        {
+          "id": "gray_filter",
+          "config": "gray_filter"
+        },
+        {
+          "id":"flow_limit_filter"
+        },
+        {
+          "id":"auth_filter",
+          "config":""
+        }
+      ],
+      "flowLimitConfig":[
+        {
+          "type":"path",
+          "value":"/http-server/ping",
+          "model":"distributed",
+          "config":{
+            "duration":20,
+            "permits":1000
+          }
+        }
+      ],
+      "retryconfig":{
+        "times":2
+      },
+      "hystrixConfigs":[
+        {
+          "path":"/http-server/ping",
+          "timeout": 50,
+          "coreThreadSize": 2,
+          "fallbackMessage": "熔断",
+          "timeoutEnabled": true,
+          "slidingWindowDuration": 1000,
+          "numberOfWindowSegments": 10,
+          "requestTimesThreshold": 10,
+          "failureRateThreshold": 30,
+          "circuitBreakerResetTime": 5000,
+          "circuitBreakerEnabled": true
+        }
+      ]
+    }
+  ]
+}

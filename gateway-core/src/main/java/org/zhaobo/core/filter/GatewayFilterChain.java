@@ -2,6 +2,7 @@ package org.zhaobo.core.filter;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.skywalking.apm.toolkit.trace.Trace;
 import org.zhaobo.core.context.GatewayContext;
 import org.zhaobo.common.exception.BaseException;
 import org.zhaobo.common.exception.RateLimitException;
@@ -30,6 +31,7 @@ public class GatewayFilterChain {
         return this;
     }
 
+    @Trace
     public GatewayContext doFilter(GatewayContext ctx) throws Exception {
         if (CollectionUtils.isEmpty(filters)){
             return ctx;

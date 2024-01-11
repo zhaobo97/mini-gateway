@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <!-- 定义日志输出格式 -->
+    <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level [%tid] %logger{36} - %msg%n" />
+    <!-- 定义日志级别 -->
+    <property name="LOG_LEVEL" value="INFO" />
+    <!-- 自定义日志目录 -->
+    <property name="LOG_DIRECTORY" value="backend-http-server/logs" />
+
+
+
+    <!-- Console Appender 配置 -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder charset="UTF-8" class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <layout class="org.apache.skywalking.apm.toolkit.log.logback.v1.x.TraceIdPatternLogbackLayout">
+                <pattern>${LOG_PATTERN}</pattern>
+            </layout>
+        </encoder>
+    </appender>
+
+    <!-- File Appender 配置 -->
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <file>${LOG_DIRECTORY}/app.log</file>
+        <encoder charset="UTF-8" class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <layout class="org.apache.skywalking.apm.toolkit.log.logback.v1.x.TraceIdPatternLogbackLayout">
+                <pattern>${LOG_PATTERN}</pattern>
+            </layout>
+        </encoder>
+    </appender>
+
+
+    <!-- 根日志记录器 -->
+    <root level="${LOG_LEVEL}">
+        <appender-ref ref="FILE" />
+        <appender-ref ref="CONSOLE" />
+    </root>
+
+</configuration>

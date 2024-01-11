@@ -28,6 +28,8 @@ public class GatewayFilterChainFactory implements FilterChainFactory{
     private final Cache<String/*rule id*/, GatewayFilterChain> filterChainCache = Caffeine.newBuilder()
             .recordStats().expireAfterWrite(10, TimeUnit.MINUTES).build(); // 10分钟后过期
 
+//    private final Map<String/*rule id*/, GatewayFilterChain> filterChainCache = new ConcurrentHashMap<>();
+
     private static class Singleton{
         private static final GatewayFilterChainFactory INSTANCE = new GatewayFilterChainFactory();
     }
@@ -65,6 +67,15 @@ public class GatewayFilterChainFactory implements FilterChainFactory{
             }
         });
     }
+
+//    public GatewayFilterChain buildFilterChain(GatewayContext ctx) throws Exception {
+//        String ruleId = ctx.getRule().getId();
+//        GatewayFilterChain gatewayFilterChain = filterChainCache.get(ruleId);
+//        if (gatewayFilterChain == null){
+//            gatewayFilterChain = doBuildFilterChain(ctx);
+//        }
+//        return gatewayFilterChain;
+//    }
 
 
     public GatewayFilterChain doBuildFilterChain(GatewayContext ctx) {

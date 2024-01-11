@@ -43,7 +43,7 @@ public enum ResponseCode {
 
     // 其他错误
     FILTER_CONFIG_PARSE_ERROR(HttpResponseStatus.INTERNAL_SERVER_ERROR, 5001, "过滤器配置解析异常"),
-    RATE_LIMIT_ERROR(HttpResponseStatus.SERVICE_UNAVAILABLE, 5002, "服务不可用(限流)")
+    RATE_LIMIT_ERROR(HttpResponseStatus.SERVICE_UNAVAILABLE, 5002, "服务不可用(限流)"),
     ;
 
     private HttpResponseStatus httpResponseStatus;

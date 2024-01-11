@@ -4,13 +4,14 @@ import com.alibaba.fastjson.JSONPath;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.http.*;
 import lombok.Setter;
-import org.asynchttpclient.cookie.Cookie;
 import io.netty.handler.codec.http.cookie.ServerCookieDecoder;
 import io.netty.util.internal.StringUtil;
 import lombok.Getter;
 import org.asynchttpclient.Request;
 import org.asynchttpclient.RequestBuilder;
 import org.zhaobo.common.constants.BasicConst;
+import org.zhaobo.common.enums.ResponseCode;
+import org.zhaobo.common.exception.NoCookieException;
 
 import java.nio.charset.Charset;
 import java.util.*;
@@ -153,6 +154,8 @@ public class GatewayRequest implements IGatewayRequest {
         if (Objects.isNull(cookieMap)) {
             cookieMap = new HashMap<>();
             String cookieKey = getHttpHeaders().get(HttpHeaderNames.COOKIE);
+            if (Objects.isNull(cookieKey))
+                throw new NoCookieException(ResponseCode.UNAUTHORIZED.getMessage(), ResponseCode.UNAUTHORIZED);
             Set<io.netty.handler.codec.http.cookie.Cookie> cookies = ServerCookieDecoder.STRICT.decode(cookieKey);
             for (io.netty.handler.codec.http.cookie.Cookie cookie : cookies) {
                 cookieMap.put(key, cookie);
