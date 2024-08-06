@@ -1,8 +1,8 @@
-Api-gatway：原生Java实现，使用Netty作为通信框架，Nacos作为注册与配置中心的api网关。
+MiniGateway：原生Java实现，使用Netty作为通信框架，Nacos作为注册与配置中心的api网关。
 
 网关功能点包括：
 1. 路由转发
-2. 协议转换（当前只实现了http）
+2. 协议转换（当前只实现了http-dubbo）
 3. 负载均衡
 4. 认证授权
 5. 黑白名单
